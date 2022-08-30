@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Whose turn it is for the song</title>
+    <style>
+        body {
+            /* design */
+            background-color: #fefefe;
+            color: #333;
+            font-family: Verdana, sans-serif;
+
+            /* stretch to the whole page */
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+
+            /* layout */
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+
+        #last-time {
+            align-self: end;
+            font-size: x-large;
+        }
+
+        #this-time {
+            align-self: center;
+            font-size: xxx-large;
+        }
+
+        #next-time {
+            align-self: start;
+            font-size: x-large;
+        }
+
+        #date { font-size: large }
+    </style>
+</head>
+<body>
+    <div id="last-time">
+        <p>Last time</p>
+        <p></p>
+    </div>
+
+    <div id="this-time">
+        <p>Today</p>
+        <p></p>
+        <p id="date"></p>
+    </div>
+
+    <div id="next-time">
+        <p>Next time</p>
+        <p></p>
+    </div>
+
+    <script>
+        // constants
+        const startingDate = new Date(2022, 7, 30); // beware of the index!
+        const songOrder = [
+            "Anton",
+            "Maksym",
+            "Anthony",
+            "Johnathan",
+            "Kyle",
+            "Shane",
+        ];
+
+        // functions
+        const areDatesEqual = (left, right) =>
+            left.getFullYear() === right.getFullYear()
+            && left.getMonth() === right.getMonth()
+            && left.getDate() === right.getDate();
+        const modulo = (dividend, divisor) => {
+            const remainder = dividend % divisor;
+            return remainder < 0 ? remainder + divisor : remainder;
+        };
+        const isWeekend = date => date.getDay() === 0 || date.getDay() === 6;
+
+        // set-up
+        const lastTimeParagraph = document.querySelector("#last-time > p:nth-child(2)");
+        const thisTimeParagraph = document.querySelector("#this-time > p:nth-child(2)");
+        const nextTimeParagraph = document.querySelector("#next-time > p:nth-child(2)");
+        const dateParagraph = document.querySelector("#date");
+        const today = new Date();
+
+        // render today's date
+        dateParagraph.textContent = today.toDateString();
+
+        // figure out whose day it is
+        let todaysSongIndex = 0;
+        for (const day = new Date(startingDate); !areDatesEqual(day, today); day.setDate(day.getDate() + 1)) {
+            if (isWeekend(day)) { continue; }
+            todaysSongIndex = (todaysSongIndex + 1) % songOrder.length;
+        }
+
+        // render results
+        if (isWeekend(today)) {
+            lastTimeParagraph.textContent = songOrder[modulo(todaysSongIndex - 1, songOrder.length)];
+            thisTimeParagraph.textContent = "... is a weekend!"
+            nextTimeParagraph.textContent = songOrder[todaysSongIndex];
+        } else {
+            lastTimeParagraph.textContent = songOrder[modulo(todaysSongIndex - 1, songOrder.length)];
+            thisTimeParagraph.textContent = songOrder[todaysSongIndex];
+            nextTimeParagraph.textContent = songOrder[(todaysSongIndex + 1) % songOrder.length];
+        }
+    </script>
+</body>
+</html>
